@@ -31,6 +31,7 @@ func NewGinEngine(ctx *context.Context, cfg *Config) *gin.Engine {
 		if cfg.UseLoggingMW {
 			engine.Use(middleware.LoggingMiddleware())
 		}
+		engine.Use(gin.Recovery())
 	}
 
 	return engine

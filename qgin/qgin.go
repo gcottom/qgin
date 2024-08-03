@@ -13,6 +13,7 @@ type Config struct {
 	UseRequestIDMW     bool
 	InjectRequestIDCTX bool
 	LogRequestID       bool
+	ProdMode           bool
 }
 
 var activeConfig Config
@@ -31,9 +32,11 @@ func NewGinEngine(ctx *context.Context, cfg *Config) *gin.Engine {
 		if cfg.UseLoggingMW {
 			engine.Use(middleware.LoggingMiddleware())
 		}
-		engine.Use(gin.Recovery())
+		if cfg.ProdMode {
+			gin.SetMode(gin.ReleaseMode)
+		}
 	}
-
+	engine.Use(gin.Recovery())
 	return engine
 }
 

@@ -19,6 +19,9 @@ type Config struct {
 var activeConfig Config
 
 func NewGinEngine(ctx *context.Context, cfg *Config) *gin.Engine {
+	if cfg != nil && cfg.ProdMode {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	engine := gin.New()
 
 	if cfg != nil {
@@ -32,9 +35,7 @@ func NewGinEngine(ctx *context.Context, cfg *Config) *gin.Engine {
 		if cfg.UseLoggingMW {
 			engine.Use(middleware.LoggingMiddleware())
 		}
-		if cfg.ProdMode {
-			gin.SetMode(gin.ReleaseMode)
-		}
+
 	}
 	engine.Use(gin.Recovery())
 	return engine

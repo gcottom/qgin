@@ -27,7 +27,7 @@ func NewGinEngine(ctx *context.Context, cfg *Config) *gin.Engine {
 	if cfg != nil {
 		setActiveConfig(cfg)
 		if cfg.UseRequestIDMW {
-			engine.Use(middleware.RequestIDMiddleware())
+			engine.Use(middleware.RequestIDMiddleware(middleware.UUIDGenerator))
 		}
 		if cfg.UseContextMW {
 			engine.Use(middleware.ContextMiddleware(*ctx))

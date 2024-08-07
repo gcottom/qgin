@@ -5,11 +5,21 @@ import (
 	"github.com/google/uuid"
 )
 
-func RequestIDMiddleware() gin.HandlerFunc {
+const ReqIDHeader = "X-Request-ID"
+
+func UUIDGenerator() string {
+	return uuid.New().String()
+}
+
+func RequestIDMiddleware(generator func() string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		requestID := uuid.New().String()
+		requestID := ctx.GetHeader(ReqIDHeader)
+		if requestID == "" {
+			requestID = generator()
+		}
+		ctx.Request.Header.Set(ReqIDHeader, requestID)
+		ctx.Header(ReqIDHeader, requestID)
 		ctx.Set("request_id", requestID)
-		ctx.Writer.Header().Set("X-Request-ID", requestID)
 		ctx.Next()
 	}
 }

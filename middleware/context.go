@@ -11,16 +11,17 @@ import (
 var InjectRequestIDCTX bool
 var LogRequestID bool
 
-func ContextMiddleware(baseCtx context.Context) gin.HandlerFunc {
+func ContextMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		ctxt := ctx.Request.Context()
 		if InjectRequestIDCTX {
-			baseCtx = context.WithValue(baseCtx, "request_id", ctx.GetHeader("request_id"))
+			ctxt = context.WithValue(ctxt, "request_id", ctx.GetHeader(ReqIDHeader))
 		}
 		if InjectRequestIDCTX && LogRequestID {
-			logger := zaplog.GetLoggerFromContext(baseCtx).With(zap.String("request_id", ctx.GetHeader(ReqIDHeader))).WithOptions(zap.AddCallerSkip(1))
-			baseCtx = context.WithValue(baseCtx, "logger", logger)
+			ctxt = zaplog.CreateAndInject(ctxt)
+			zaplog.GetLoggerFromContext(ctxt).With(zap.String("request_id", ctx.GetHeader(ReqIDHeader))).WithOptions(zap.AddCallerSkip(1))
 		}
-		ctx.Request = ctx.Request.WithContext(baseCtx)
+		ctx.Request = ctx.Request.WithContext(ctxt)
 		ctx.Next()
 	}
 }

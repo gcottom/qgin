@@ -30,7 +30,7 @@ func NewGinEngine(ctx *context.Context, cfg *Config) *gin.Engine {
 			engine.Use(middleware.RequestIDMiddleware(middleware.UUIDGenerator))
 		}
 		if cfg.UseContextMW {
-			engine.Use(middleware.ContextMiddleware(*ctx))
+			engine.Use(middleware.ContextMiddleware())
 		}
 		if cfg.UseLoggingMW {
 			engine.Use(middleware.LoggingMiddleware())

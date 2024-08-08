@@ -19,7 +19,8 @@ func ContextMiddleware() gin.HandlerFunc {
 		}
 		if InjectRequestIDCTX && LogRequestID {
 			ctxt = zaplog.CreateAndInject(ctxt)
-			zaplog.GetLoggerFromContext(ctxt).With(zap.String("request_id", ctx.GetHeader(ReqIDHeader))).WithOptions(zap.AddCallerSkip(1))
+			logger := zaplog.GetLoggerFromContext(ctxt).With(zap.String("request_id", ctx.GetHeader(ReqIDHeader))).WithOptions(zap.AddCallerSkip(1))
+			ctxt = context.WithValue(ctxt, "logger", logger)
 		}
 		ctx.Request = ctx.Request.WithContext(ctxt)
 		ctx.Next()
